@@ -251,36 +251,7 @@ $(function() {
         	if (node.type && node.type == 'parent')
         		return;
 
-        	if (node.id && node.id == 'c1-f1') {
         		$li.find('.jqtree-element').attr('fixture-type', 'green').attr('drop-target', 'true').addClass('peg').attr('draggable', 'true').attr('ondragstart','drag(event)').attr('data-toggle', 'popover');
-        	}
-        	if (node.id && node.id == 'c1-f2') {
-        		$li.find('.jqtree-element').append(
-                	'<div class="peg red" draggable="true" ondragstart="drag(event)" fixture-type="red" data-toggle="popover" data-original-title=" Projector ID : ' + node.id + '"></div>'
-            	);
-        	}
-        	if (node.id && node.id == 'c2-f1') {
-        		$li.find('.jqtree-element').append(
-                	'<div class="peg blue" draggable="true" ondragstart="drag(event)" fixture-type="blue" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
-        	if (node.id && node.id == 'c2-f2') {
-        		$li.find('.jqtree-element').append(
-                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
-        	if (node.id && node.id == 'c2-f3') {
-        		$li.find('.jqtree-element').append(
-                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
-        	if (node.id && node.id == 'c3-f1') {
-        		$li.find('.jqtree-element').append(
-                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
-        	if (node.id && node.id == 'c3-f2') {
-        		$li.find('.jqtree-element').append(
-                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
-
-        	if (node.id && node.id == 'c3-f3') {
-        		$li.find('.jqtree-element').append(
-                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
-        	if (node.id && node.id == 'c1-f3') {
-        		$li.find('.jqtree-element').append(
-                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
         }
     });
 });
