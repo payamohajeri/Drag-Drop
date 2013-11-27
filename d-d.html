@@ -250,7 +250,6 @@ $(function() {
         onCreateLi: function(node, $li) {
         	if (node.type && node.type == 'parent')
         		return;
-
         		$li.find('.jqtree-element').attr('fixture-type', 'green').attr('drop-target', 'true').addClass('peg').attr('draggable', 'true').attr('ondragstart','drag(event)').attr('data-toggle', 'popover');
         }
     });
@@ -265,11 +264,12 @@ $(function() {
 		$('.peg').popover({
 			title:"Projector ID :",
 			html:'true',
-			content: '<p><b>Projector Description :</b><br/> This is a projector from with id=  and type=Type.</p><br/><p>DMX Numbers = </p><br/><div class="image green"></div>', 
+			content: '<p><b>Projector Description :</b><br/> This is a projector from with id=  and type=Type.</p><br/><p>DMX Numbers = </p><br/><div class="image green"></div>'
 		});
-		
+
 		$(window).scroll(function() {
 	        $('.peg').popover('hide');
+	        $('.pegg').popover('hide');
 	    });
 
 		var width = $('.slot').width();
@@ -326,6 +326,7 @@ $(function() {
 			$.q('.slot').width(width).height(height);
 			$.q('.col-right').width(((width + 5) * 55) + 20).height(((height + 5) * 55) + 20);
 		});
+
 		$(document).on('dblclick', '.slot', function() {
 			var bgClass = $(this).attr('fixture-type');
 			if (bgClass) {
@@ -437,7 +438,13 @@ $(function() {
 		if (drag.attr('drop-target')) {
 			$('#' + drag.attr('id')).removeClass(bgClass).removeAttr('fixture-type').removeAttr('drop-target');
 		}
-		drop.attr("oncontextmenu", "detailForm(\""+drop.attr('id')+"\", \""+drop.attr('fixture-type')+"\");");
+		drop.attr("oncontextmenu", "detailForm(\""+drop.attr('id')+"\", \""+drop.attr('fixture-type')+"\");").addClass('pegg').attr('data-toggle', 'popover');
+		
+		$('.pegg').popover({
+			title:"Projector ID :",
+			html:'true',
+			content: '<p><b>Projector Description :</b><br/> This is a projector from with id=  and type=Type.</p><br/><p>DMX Numbers = </p><br/><div class="image green"></div>'
+		});
 	}
 </script>
 </html>
