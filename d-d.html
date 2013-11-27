@@ -1,0 +1,472 @@
+<html oncontextmenu="return false;" >
+<head>
+	<title>Drag and Drop Demo</title>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jqache-0.1.1.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-popover.min.js"></script>
+	<link href="css/bootstrap.css" rel="stylesheet">
+	<!-- NEW/ -->
+	<link rel="stylesheet" href="jqtree.css">
+	<!-- /NEW -->
+	<style>
+		body {
+			background: url(img/pattern.png);
+		}
+
+		[draggable] {
+			-moz-user-select: none;
+			-khtml-user-select: none;
+			-webkit-user-select: none;
+			user-select: none;
+			/* Required to make elements draggable in old WebKit */
+			-khtml-user-drag: element;
+			-webkit-user-drag: element;
+			cursor: move;
+			border: 10px solid black;
+		}
+
+		.peg {
+			text-align: center;
+			font-weight: bold;
+			border: 1px solid #e1e1e8;
+			/*width: 10px;
+			height: 10px;*/
+			margin: 2px;
+			/*float: right;*/
+		}
+		
+		.popover-content {
+			margin-top:20px;
+		}
+		.slot {
+			margin-right: 1px;
+			margin-top: 1px;
+			width: 50px;
+			height: 50px;
+		    display: inline-block;
+		    border: 2px solid #e1e1e8;
+		}
+
+		.red {
+			background-color: red;
+		}
+
+		.blue {
+			background-color: blue;
+		}
+
+		.green {
+			background-color: green;
+		}
+
+		.black {
+			background-color: black;
+			color: white;
+		}
+
+		.grey {
+			background-color: grey;
+		}
+
+		.col-left {
+			margin-top:100px;
+			margin-left: 20px;
+			display: inline-block;
+			position: fixed;
+			border: 2px solid #e1e1e8;
+			padding: 10px;
+			border-radius: 1px;
+			background-color: #f7f7f9;
+			opacity: .9;
+			z-index: 1000;
+			/*<!-- NEW/ -->*/
+			width: 200px;
+			/*<!-- /NEW -->*/
+		}
+
+		.col-right {
+			margin-left: 290px;
+			width: %COL_RIGHT_WIDTH%px;
+			height: %COL_RIGHT_HEIGHT%px;
+			display: inline-block;
+			position: absolute;
+		}
+
+		.items {
+			/*<!-- NEW/ -->*/
+			max-height: 290px;
+			/*<!-- /NEW -->*/
+			overflow-x: hidden;
+    		overflow-y: scroll;
+			padding:0px 20px 0px 20px;
+		}
+
+		button {
+			font-weight: bold;
+			width: 69px;
+			margin: 5px;
+			height: 30px;
+		}
+
+		.popover {
+			width: 320px;
+			cursor: default;
+		}
+
+		#message {
+			position: fixed;
+			top: 20px;
+			left: 250px;
+			display: none;
+			z-index: 10;
+		}
+
+		#message .container {
+			max-width: 135px;
+		}
+
+		#message #content {
+			padding: 8px 15px;
+			margin-bottom: 20px;
+			text-align: justify;
+			box-shadow: 0 0 10px #e6ddb3;
+			max-height: 142px;
+		}
+
+		#message .alert-note {
+			background-color: #FFFDC1;
+			border-color: #FFFC99;
+			color: #6b5d49;
+			box-shadow: 0 0 10px #FFFC99;
+		}
+
+		#message a.link:hover .alert-note {
+			background-color: #fffca7;
+		}
+
+		#message a {
+			text-decoration: none;
+		}
+
+		p {
+			margin: 0;
+		}
+
+		hr {
+			margin: 15px 0;
+		}
+		.image {
+			border: 1px solid #E1E1E8;
+			font-weight: bold;
+			height: 50px;
+			margin: 5px;
+			text-align: center;
+			width: 50px;
+		}
+	</style>
+</head>
+<body oncontextmenu="return false;" >
+	<div style="margin-top:20px; margin-bottom:20px;">
+		<div id="message">
+			<div class="container">
+				<a href="" class="link"><div id="content" class="alert alert-note" style="word-wrap: break-word;"></div></a>
+			</div>
+		</div>
+		<div class="col-left">
+			<div class="items">
+			<!-- NEW/ -->
+			<!-- /NEW -->
+			</div>
+			<hr>
+			<p><button class="btn zoomin" style="margin-right:0px;"><i class="icon-plus"></i></button><button class="btn zoomout"><i class="icon-minus"></i></button></p>
+			<div id="detail" style="margin-top:20px;"></div>
+		</div>
+		<div class="col-right">
+		<script>
+			for( var i=1; i<10; i++ ) {
+				document.write('<div id="row-"'+i+'">');
+				for (var j=1; j<10; j++ ) {
+					document.write('<span class="slot" id="'+i+'-'+j+'" oncontextmenu="rightClick(this)" ondrop="drop(event)" ondragleave="dragLeave(event)" ondragover="dragOver(event)" draggable="true" ondragstart="drag(event)"></span>');
+				}
+				document.write('</div>');
+			}
+		</script>
+		</div>
+	</div>
+</body>
+<!-- NEW/ -->
+<script type="text/javascript" src="tree.jquery.js"></script>
+<script type="text/javascript" src="jquery.cookie.js"></script>
+<!-- /NEW -->
+<script>
+/*<!-- NEW/ -->*/
+$(function() {
+	var data = [	// JSON format
+		{
+			label: 'Generic',
+			id: 'c1',
+			type: 'parent',
+			children: [
+				{ label: 'Fernel', id: 'c1-f1' },
+				{ label: 'Soft', id: 'c1-f2' },
+				{ label: 'Cool Light (Soft)', id: 'c1-f3' },
+				{ label: 'Cool Light (Spot)', id: 'c1-f4' },
+				{ label: 'LED', id: 'c1-f5' },
+				{ label: 'LED (RGB)', id: 'c1-f6' }
+			]
+		},
+		{
+			label: 'Hamaye',
+			id: 'c2',
+			type: 'parent',
+			children: [
+				{ label: 'AF650', id: 'c2-f1' },
+				{ label: 'AF1000', id: 'c2-f2' },
+				{ label: 'AF2000', id: 'c2-f3' },
+				{ label: 'BH110', id: 'c2-f4' },
+				{ label: 'BH220', id: 'c2-f5' },
+				{ label: 'BH330', id: 'c2-f6' },
+				{ label: 'BH440', id: 'c2-f7' },
+			]
+		},
+		{
+			label: 'Martin',
+			id: 'c3',
+			type: 'parent',
+			children: [
+				{ label: 'Moving Head M1', id: 'c3-f1' },
+				{ label: 'Moving Head M2', id: 'c3-f2' },
+				{ label: 'Scanner S1', id: 'c3-f3' },
+				{ label: 'Scanner S2', id: 'c3-f4' },
+			]
+		}
+	];
+
+	var $tree = $('.items');
+    $tree.tree({
+        data: data,
+        autoOpen: true,
+        onCreateLi: function(node, $li) {
+        	if (node.type && node.type == 'parent')
+        		return;
+
+        	if (node.id && node.id == 'c1-f1') {
+        		$li.find('.jqtree-element').attr('fixture-type', 'green').attr('drop-target', 'true').addClass('peg').attr('draggable', 'true').attr('ondragstart','drag(event)').attr('data-toggle', 'popover');
+        	}
+        	if (node.id && node.id == 'c1-f2') {
+        		$li.find('.jqtree-element').append(
+                	'<div class="peg red" draggable="true" ondragstart="drag(event)" fixture-type="red" data-toggle="popover" data-original-title=" Projector ID : ' + node.id + '"></div>'
+            	);
+        	}
+        	if (node.id && node.id == 'c2-f1') {
+        		$li.find('.jqtree-element').append(
+                	'<div class="peg blue" draggable="true" ondragstart="drag(event)" fixture-type="blue" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
+        	if (node.id && node.id == 'c2-f2') {
+        		$li.find('.jqtree-element').append(
+                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
+        	if (node.id && node.id == 'c2-f3') {
+        		$li.find('.jqtree-element').append(
+                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
+        	if (node.id && node.id == 'c3-f1') {
+        		$li.find('.jqtree-element').append(
+                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
+        	if (node.id && node.id == 'c3-f2') {
+        		$li.find('.jqtree-element').append(
+                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
+
+        	if (node.id && node.id == 'c3-f3') {
+        		$li.find('.jqtree-element').append(
+                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
+        	if (node.id && node.id == 'c1-f3') {
+        		$li.find('.jqtree-element').append(
+                	'<div class="peg green" draggable="true" ondragstart="drag(event)" fixture-type="green" data-toggle="popover" data-original-title=" Projector ID : "' + node.id + '" ></div>');}
+        }
+    });
+});
+/*<!-- /NEW -->*/
+	$(document).ready(function() {
+
+		$('#message').click(function(){
+			$('#message').css('display', 'none');
+		});
+		
+		$('.peg').popover({
+			title:"Projector ID :",
+			html:'true',
+			content: '<p><b>Projector Description :</b><br/> This is a projector from with id=  and type=Type.</p><br/><p>DMX Numbers = </p><br/><div class="image green"></div>', 
+		});
+		
+		$(window).scroll(function() {
+	        $('.peg').popover('hide');
+	    });
+
+		var width = $('.slot').width();
+		var height = $('.slot').height();
+
+		$('.zoomout').on('click', function() {
+			if ($('.zoomin').hasClass('disabled')) {
+				$('.zoomin').removeClass('disabled');
+			}
+
+			if (width < 30 || height < 30) {
+				if (!$(this).hasClass('disabled')) {
+					$(this).addClass('disabled');
+
+					$('#content').empty().append('<strong>Zoom-Out limit</strong>');
+					$('#message').fadeIn().fadeOut(2000);
+				}
+
+				return false;
+			}
+			else if ($(this).hasClass('disabled')) {
+				$(this).removeClass('disabled');
+			}
+
+			width = width - 25;
+			height = height - 25;
+
+			$.q('.slot').width(width).height(height);
+			$.q('.col-right').width(((width + 5) * 55) + 20).height(((height + 5) * 55) + 20);
+		});
+
+		$('.zoomin').on('click', function() {
+			if ($('.zoomout').hasClass('disabled')) {
+				$('.zoomout').removeClass('disabled');
+			}
+
+			if (width > 200 || height > 200) {
+				if (!$(this).hasClass('disabled')) {
+					$(this).addClass('disabled');
+
+					$('#content').empty().append('<strong>Zoom-In limit</strong>');
+					$('#message').fadeIn().fadeOut(2000);
+				}
+
+				return false;
+			}
+			else if ($(this).hasClass('disabled')) {
+				$(this).removeClass('disabled');
+			}
+
+			width = width + 25;
+			height = height + 25;
+
+			$.q('.slot').width(width).height(height);
+			$.q('.col-right').width(((width + 5) * 55) + 20).height(((height + 5) * 55) + 20);
+		});
+		$(document).on('dblclick', '.slot', function() {
+			var bgClass = $(this).attr('fixture-type');
+			if (bgClass) {
+				$(this).removeClass(bgClass).removeAttr('fixture-type');
+			}
+		});
+
+		$(document).on('click', '.popover', function() {
+			$(this).popover('hide');
+		});
+	});
+
+	function rightClick(obj) {
+		// TODO
+	}
+	
+	function detailForm(dropID, data) {
+		//TODO Load Privous Data
+		$("#detail").empty();
+		var optins;
+		var optinsNO;
+		for(var i = 1; i <= 512; i++) {
+			optins += "<option>" + i + "</option>";
+		}
+		for(var i = 1; i < 3; i++) {
+			optinsNO += "<option>" + i + "</option>";
+		}
+		var nameVal=$("#"+dropID).attr("name");
+		if(nameVal) {
+			$('#detail').append('<hr/><p style="max-width:140px; text-align:middle; margin-left:10px;">Details for projector: <br>\"' + dropID + '\"</br></p><hr/><div class="form-inline" style="max-width:153px;"><div><div class="form-group" ><label class="sr-only" for="InputName">Name:</label><input type="text" class="form-control" id="InputName" placeholder="Name" style="width:100px; height:25px; margin-left:10px;" value=\"' + nameVal + '\"></div><select style="background-color: #FFFFFF; border: 1px solid #CCCCCC; width: 60px; margin-top:10px; margin-left:10px;" id="InputDMX" >' + optins + '</select><select style=" background-color: #FFFFFF; border: 1px solid #CCCCCC; width:60px; margin-top:10px; margin-left:23px; margin-right:0px;" id="DMXNO" >' + optinsNO + '</select><button class="btn btn-primary" style="margin-top:10px; margin-left:50px;">Submit</button></div>');
+		} else {
+			$('#detail').append('<hr/><p style="max-width:140px; text-align:middle; margin-left:10px;">Details for projector: <br>\"' + dropID + '\"</br></p><hr/><div class="form-inline" style="max-width:153px;"><div><div class="form-group" ><label class="sr-only" for="InputName">Name:</label><input type="text" class="form-control" id="InputName" placeholder="Name" style="width:100px; height:25px; margin-left:10px;" value="DEFAULT"></div><select style="background-color: #FFFFFF; border: 1px solid #CCCCCC; width: 60px; margin-top:10px; margin-left:10px;" id="InputDMX" >' + optins + '</select><select style=" background-color: #FFFFFF; border: 1px solid #CCCCCC; width:60px; margin-top:10px; margin-left:23px; margin-right:0px;" id="DMXNO" >' + optinsNO + '</select><button class="btn btn-primary" style="margin-top:10px; margin-left:50px;">Submit</button></div>');
+		}
+		$('#detail').contents().find("button").attr("onclick", "formSubmition(\"" + dropID + "\", \"" + data + "\")");
+		$('#detail').fadeIn();
+		
+		return false;
+	}
+
+	function formSubmition(dropID, data) {
+		//TODO Save New Data
+		var NameVal=document.getElementById("InputName").value;
+		$("#"+dropID).attr("name",NameVal);
+		var button = $("#detail").contents().find("button");
+		button.removeClass("btn-primary").addClass("btn-success").html("wait...");
+		$("#detail").delay(300).fadeOut();
+	}
+
+	function removeSubmition(dropID, data) {
+		//TODO Removed Saved Data
+		var button = $("#detail").contents().find("button");
+		button.removeClass("btn-primary").addClass("btn-success").html("wait...");
+		$("#detail").delay(300).fadeOut();	
+	}
+
+	function dragOver(ev) {
+		ev.preventDefault();
+		ev.target.style.border = '2px dashed black';
+	}
+
+	function dragLeave(ev) {
+		ev.preventDefault();
+		ev.target.style.border = '2px solid #e1e1e8';
+	}
+
+	function drag(ev) {
+		ev.dataTransfer.setData('drag-obj', ev.target.outerHTML.toString());
+		var drag = $(ev.dataTransfer.getData('drag-obj'));
+		drag.addClass('red');
+		$('.col-right').css('opacity', '.6');
+	}
+
+	function drop(ev) {
+		ev.preventDefault();
+		ev.target.style.border = '2px solid #e1e1e8';
+		$('.col-right').css('opacity', '1');
+
+		var drag = $(ev.dataTransfer.getData('drag-obj'));
+		var drop = $(ev.target);
+
+		if (drag.attr('id') && drop.attr('id') && drag.attr('id') === drop.attr('id')) {
+			return;
+		}
+
+		//empty grid cannot remove colored grid
+		if (!drag.attr('fixture-type')) {
+			return;
+		}
+
+		//colored grid cannot remove colored grid
+		if (drop.attr('fixture-type')) {
+			return;
+		}
+
+		//clear the previously applied color, if it exists
+		var bgClass = drop.attr('fixture-type');
+		if (bgClass) {
+			drop.removeClass(bgClass).removeAttr('fixture-type');
+			if (drop.attr('drop-target')) {
+				drop.removeAttr('drop-target');
+			}
+		}
+
+		//add the dragged color
+		bgClass = drag.attr("fixture-type");
+		drop.addClass(bgClass).attr('fixture-type', bgClass).attr('drop-target', 'true');
+
+		//if element has been dragged from the grid, clear dragged color
+		if (drag.attr('drop-target')) {
+			$('#' + drag.attr('id')).removeClass(bgClass).removeAttr('fixture-type').removeAttr('drop-target');
+		}
+		drop.attr("oncontextmenu", "detailForm(\""+drop.attr('id')+"\", \""+drop.attr('fixture-type')+"\");");
+	}
+</script>
+</html>
