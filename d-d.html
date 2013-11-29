@@ -23,7 +23,7 @@
 			-khtml-user-drag: element;
 			-webkit-user-drag: element;
 			cursor: move;
-			border: 10px solid black;
+			border: 1px solid black;
 		}
 
 		.peg {
@@ -40,8 +40,7 @@
 			margin-top:20px;
 		}
 		.slot {
-			margin-right: 1px;
-			margin-top: 1px;
+			margin:2px;
 			width: 50px;
 			height: 50px;
 		    display: inline-block;
@@ -87,10 +86,11 @@
 
 		.col-right {
 			margin-left: 290px;
-			width: %COL_RIGHT_WIDTH%px;
-			height: %COL_RIGHT_HEIGHT%px;
+			width: 1000px;
+			height: 1000px;
 			display: inline-block;
 			position: absolute;
+			margin-top:80px;
 		}
 
 		.items {
@@ -111,6 +111,7 @@
 
 		.popover {
 			width: 320px;
+			height:250px;
 			cursor: default;
 		}
 
@@ -164,6 +165,28 @@
 			text-align: center;
 			width: 50px;
 		}
+
+		.desc {
+			display:inline-block;
+			position:relative;
+			font-weight:bold;
+			bottom:0px; width:90%; height:30%;
+			background-color:#0099FF;
+			text-align: center;
+			z-index:0;
+			margin:0px; padding:0px;
+			font-size:8px;
+			margin-top:60%;
+			float:left;
+			overflow:hidden;
+		}
+		.desc:hover {
+			background-color:red;
+			width:200%; height:80%;
+			font-size:16px;
+			z-index:1;
+		}
+		
 	</style>
 </head>
 <body oncontextmenu="return false;" >
@@ -249,8 +272,12 @@ $(function() {
         autoOpen: true,
         onCreateLi: function(node, $li) {
         	if (node.type && node.type == 'parent')
+        	{
         		return;
-        		$li.find('.jqtree-element').attr('fixture-type', 'green').attr('drop-target', 'true').addClass('peg').attr('draggable', 'true').attr('ondragstart','drag(event)').attr('data-toggle', 'popover');
+        	}
+        	//node.name
+        	$li.find('.jqtree-element').attr('fixture-type', 'green').attr('drop-target', 'true').addClass('peg').attr('draggable', 'true').attr('ondragstart','drag(event)').attr('data-toggle', 'popover');
+        	$li.find('.jqtree-element').attr('fixture-label', node.name);
         }
     });
 });
@@ -330,7 +357,7 @@ $(function() {
 		$(document).on('dblclick', '.slot', function() {
 			var bgClass = $(this).attr('fixture-type');
 			if (bgClass) {
-				$(this).removeClass(bgClass).removeAttr('fixture-type');
+				$(this).removeClass(bgClass).removeAttr('fixture-type').html("");
 			}
 		});
 
@@ -384,23 +411,33 @@ $(function() {
 
 	function dragOver(ev) {
 		ev.preventDefault();
-		ev.target.style.border = '2px dashed black';
+		if (!ev.target.classList.contains("pdesc")) {
+			ev.target.style.border = '2px dashed black';
+		}
 	}
 
 	function dragLeave(ev) {
 		ev.preventDefault();
-		ev.target.style.border = '2px solid #e1e1e8';
+		if (!ev.target.classList.contains("pdesc")) {
+			ev.target.style.border = '2px solid #e1e1e8';
+		}
 	}
 
 	function drag(ev) {
 		ev.dataTransfer.setData('drag-obj', ev.target.outerHTML.toString());
-		var drag = $(ev.dataTransfer.getData('drag-obj'));
-		drag.addClass('red');
-		$('.col-right').css('opacity', '.6');
+		if (!ev.target.classList.contains("pdesc")) {
+			$('.col-right').css('opacity', '.6');
+		}
 	}
 
 	function drop(ev) {
 		ev.preventDefault();
+
+		if (ev.target.classList.contains("pdesc")) {
+			$('.col-right').css('opacity', '1');
+			return;
+		}
+
 		ev.target.style.border = '2px solid #e1e1e8';
 		$('.col-right').css('opacity', '1');
 
@@ -436,14 +473,14 @@ $(function() {
 
 		//if element has been dragged from the grid, clear dragged color
 		if (drag.attr('drop-target')) {
-			$('#' + drag.attr('id')).removeClass(bgClass).removeAttr('fixture-type').removeAttr('drop-target');
+			$('#' + drag.attr('id')).removeClass(bgClass).removeAttr('fixture-type').removeAttr('drop-target').html("");
 		}
-		drop.attr("oncontextmenu", "detailForm(\""+drop.attr('id')+"\", \""+drop.attr('fixture-type')+"\");").addClass('pegg').attr('data-toggle', 'popover');
+		drop.attr("oncontextmenu", "detailForm(\""+drop.attr('id')+"\", \""+drop.attr('fixture-type')+"\");").addClass('pegg').attr('data-toggle', 'popover').attr('fixture-label',drag.attr('fixture-label')).append('<div class="desc"><p class="pdesc">'+drag.attr('fixture-label')+'-'+drop.attr('id')+'</p></div>');
 		
 		$('.pegg').popover({
-			title:"Projector ID :",
+			title:"Projector :" + drag.attr('fixture-label')+'-'+drop.attr('id'),
 			html:'true',
-			content: '<p><b>Projector Description :</b><br/> This is a projector from with id=  and type=Type.</p><br/><p>DMX Numbers = </p><br/><div class="image green"></div>'
+			content: '<p><b>Projector Description :</b><br/> This is a projector from with id='+drop.attr('id')+'  and type='+drag.attr('fixture-label')+'.</p><br/><p>DMX Numbers = </p><br/><div class="image green"></div>'
 		});
 	}
 </script>
