@@ -5,6 +5,7 @@
 	<script src="js/jqache-0.1.1.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/bootstrap-popover.min.js"></script>
+	<script type="text/javascript" src="js/undomanager.js"></script>
 	<link href="css/bootstrap.css" rel="stylesheet">
 	<!-- NEW/ -->
 	<link rel="stylesheet" href="jqtree.css">
@@ -186,6 +187,12 @@
 			font-size:16px;
 			z-index:1;
 		}
+		.undoo {
+			margin-left:25px;
+		}
+		.zoom {
+			margin-left:25px;
+		}
 		
 	</style>
 </head>
@@ -202,15 +209,19 @@
 			<!-- /NEW -->
 			</div>
 			<hr>
-			<p><button class="btn zoomin" style="margin-right:0px;"><i class="icon-plus"></i></button><button class="btn zoomout"><i class="icon-minus"></i></button></p>
+			<div class="undoo"><p><button type="button" id="btnUndo" class="btn btn-primary undo" style="margin-right:0px;"><i class="icon-chevron-left"></i></button><button type="button" id="btnRedo" class="btn btn-success redo"><i class="icon-chevron-right"></i></button></p></div>
+			<hr>
+			<div class="zoom"><p><button class="btn btn-info zoomin" style="margin-right:0px;"><i class="icon-plus"></i></button><button class="btn btn-info zoomout"><i class="icon-minus"></i></button></p></div>
 			<div id="detail" style="margin-top:20px;"></div>
 		</div>
 		<div class="col-right">
 		<script>
-			for( var i=1; i<10; i++ ) {
-				document.write('<div id="row-"'+i+'">');
-				for (var j=1; j<10; j++ ) {
-					document.write('<span class="slot" id="'+i+'-'+j+'" oncontextmenu="rightClick(this)" ondrop="drop(event)" ondragleave="dragLeave(event)" ondragover="dragOver(event)" draggable="true" ondragstart="drag(event)"></span>');
+			var _row = 10;
+			var _col = 10;
+			for( var i=1; i<_row; i++ ) {
+				document.write('<div id="row-c"'+i+'">');
+				for (var j=1; j<_col; j++ ) {
+					document.write('<span class="slot" id="c'+i+'-f'+j+'" oncontextmenu="rightClick(this)" ondrop="drop(event)" ondragleave="dragLeave(event)" ondragover="dragOver(event)" draggable="true" ondragstart="drag(event)"></span>');
 				}
 				document.write('</div>');
 			}
@@ -364,7 +375,71 @@ $(function() {
 		$(document).on('click', '.popover', function() {
 			$(this).popover('hide');
 		});
+		
+	    btnUndo = document.getElementById('btnUndo');
+	    btnRedo = document.getElementById('btnRedo');
+		
+	    function updateUI() {
+	        btnUndo.disabled = !undoManager.hasUndo();
+    	    btnRedo.disabled = !undoManager.hasRedo();
+    	}
+		
+		undoManager.setCallback(updateUI);
+		
+		btnUndo.onclick = function () {
+		    undoManager.undo();
+		    updateUI();
+		};
+
+		btnRedo.onclick = function () {
+		    undoManager.redo();
+		    updateUI();
+		};
+		
+		updateUI();
+
 	});
+
+	var undoManager = new UndoManager();
+	var btnUndo;
+	var btnRedo;
+
+	addfixture = function(id, drop, drag) {
+		bgClass = drag.attr("fixture-type");
+		drop.addClass(bgClass).attr('fixture-type', bgClass).attr('drop-target', 'true');
+		drop.attr("oncontextmenu", "detailForm(\""+drop.attr('id')+"\", \""+drop.attr('fixture-type')+"\");").addClass('pegg').attr('data-toggle', 'popover').attr('fixture-label',drag.attr('fixture-label')).append('<div class="desc"><p class="pdesc">'+drag.attr('fixture-label')+'-'+drop.attr('id')+'</p></div>');
+		var dmx = drop.attr('id').split('-');
+		dmx[0]=dmx[0].slice(1,dmx[0].length);
+		dmx[1]=dmx[1].slice(1,dmx[1].length);
+		var dmxno=(dmx[0]-1)*_row+parseInt(dmx[1]);
+		$('.pegg').popover({
+			title:"Projector :" + drag.attr('fixture-label')+'-'+drop.attr('id'),
+			html:'true',
+			content: '<p><b>Projector Description :</b><br/> This is a projector from with id='+drop.attr('id')+'  and type='+drag.attr('fixture-label')+'.</p><br/><p>DMX Numbers = '+ dmxno +'</p><br/><div class="image green"></div>'
+		});
+	};
+
+	removefixture = function(id, drag) {
+		bgClass = drag.attr("fixture-type");
+		$('#' + id).removeClass(bgClass).removeAttr('fixture-type').removeAttr('drop-target').html("");
+	};
+
+	function createfixture (id, drop, drag) {
+
+		// initial storage
+		addfixture(id, drop, drag);
+
+		// make undo-able
+		undoManager.add({
+			undo: function() {
+			    removefixture(id, drag);
+			},
+			redo: function() {
+			    addfixture(id, drop, drag);
+			}
+		});
+	}
+
 
 	function rightClick(obj) {
 		// TODO
@@ -406,26 +481,26 @@ $(function() {
 		//TODO Removed Saved Data
 		var button = $("#detail").contents().find("button");
 		button.removeClass("btn-primary").addClass("btn-success").html("wait...");
-		$("#detail").delay(300).fadeOut();	
+		$("#detail").delay(300).fadeOut();
 	}
 
 	function dragOver(ev) {
 		ev.preventDefault();
-		if (!ev.target.classList.contains("pdesc")) {
+		if (!ev.target.classList.contains("pdesc") && !ev.target.classList.contains("desc")) {
 			ev.target.style.border = '2px dashed black';
 		}
 	}
 
 	function dragLeave(ev) {
 		ev.preventDefault();
-		if (!ev.target.classList.contains("pdesc")) {
+		if (!ev.target.classList.contains("pdesc") && !ev.target.classList.contains("desc")) {
 			ev.target.style.border = '2px solid #e1e1e8';
 		}
 	}
 
 	function drag(ev) {
 		ev.dataTransfer.setData('drag-obj', ev.target.outerHTML.toString());
-		if (!ev.target.classList.contains("pdesc")) {
+		if (!ev.target.classList.contains("pdesc") && !ev.target.classList.contains("desc")) {
 			$('.col-right').css('opacity', '.6');
 		}
 	}
@@ -433,7 +508,7 @@ $(function() {
 	function drop(ev) {
 		ev.preventDefault();
 
-		if (ev.target.classList.contains("pdesc")) {
+		if (ev.target.classList.contains("pdesc") || ev.target.classList.contains("desc")) {
 			$('.col-right').css('opacity', '1');
 			return;
 		}
@@ -469,19 +544,12 @@ $(function() {
 
 		//add the dragged color
 		bgClass = drag.attr("fixture-type");
-		drop.addClass(bgClass).attr('fixture-type', bgClass).attr('drop-target', 'true');
 
 		//if element has been dragged from the grid, clear dragged color
 		if (drag.attr('drop-target')) {
 			$('#' + drag.attr('id')).removeClass(bgClass).removeAttr('fixture-type').removeAttr('drop-target').html("");
 		}
-		drop.attr("oncontextmenu", "detailForm(\""+drop.attr('id')+"\", \""+drop.attr('fixture-type')+"\");").addClass('pegg').attr('data-toggle', 'popover').attr('fixture-label',drag.attr('fixture-label')).append('<div class="desc"><p class="pdesc">'+drag.attr('fixture-label')+'-'+drop.attr('id')+'</p></div>');
-		
-		$('.pegg').popover({
-			title:"Projector :" + drag.attr('fixture-label')+'-'+drop.attr('id'),
-			html:'true',
-			content: '<p><b>Projector Description :</b><br/> This is a projector from with id='+drop.attr('id')+'  and type='+drag.attr('fixture-label')+'.</p><br/><p>DMX Numbers = </p><br/><div class="image green"></div>'
-		});
+		createfixture(drop.attr('id'), drop, drag);
 	}
 </script>
 </html>
