@@ -87,8 +87,8 @@
 
 		.col-right {
 			margin-left: 290px;
-			width: 1000px;
-			height: 1000px;
+			width: %COL_RIGHT_WIDTH%px;
+			height: %COL_RIGHT_HEIGHT%px;
 			display: inline-block;
 			position: absolute;
 			margin-top:80px;
@@ -215,17 +215,7 @@
 			<div id="detail" style="margin-top:20px;"></div>
 		</div>
 		<div class="col-right">
-		<script>
-			var _row = 10;
-			var _col = 10;
-			for( var i=1; i<_row; i++ ) {
-				document.write('<div id=\"row-c'+i+'\">');
-				for (var j=1; j<_col; j++ ) {
-					document.write('<span class="slot" id="c'+i+'-f'+j+'" oncontextmenu="rightClick(this)" ondrop="drop(event)" ondragleave="dragLeave(event)" ondragover="dragOver(event)" draggable="true" ondragstart="drag(event)"></span>');
-				}
-				document.write('</div>');
-			}
-		</script>
+			%GRID%
 		</div>
 	</div>
 </body>
@@ -235,10 +225,6 @@
 <!-- /NEW -->
 <script>
 /*<!-- NEW/ -->*/
-
-// TODO , remove dmx values
-// TODO , UNDO
-
 var undoCommands = [],
 	index = -1,
 	isExecuting = false,
@@ -389,13 +375,16 @@ $(function() {
         		return;
         	}
         	//node.name
-        	$li.find('.jqtree-element').attr('fixture-type', 'green').addClass('peg').attr('draggable', 'true').attr('ondragstart','drag(event)').attr('data-toggle', 'popover').attr('last',0); // attr('drop-target', 'true')
+                $li.find('.jqtree-element').attr('fixture-type', 'green').addClass('peg').attr('data-toggle', 'popover').attr('last',0); // attr('drop-target', 'true')
         	$li.find('.jqtree-element').attr('fixture-label', node.name);
         }
     });
 });
 /*<!-- /NEW -->*/
 	$(document).ready(function() {
+		
+        _row = %ROW%;
+        _col = %COL%;
 
 		$('#message').click(function(){
 			$('#message').css('display', 'none');
@@ -478,13 +467,9 @@ $(function() {
 			$(this).popover('hide');
 		});
 		
-		$(".pegg").on('click', function() {
-			$(".pegg").popover('hide');
-		});
-		
 	    btnUndo = document.getElementById('btnUndo');
 	    btnRedo = document.getElementById('btnRedo');
-	    
+		
 	    function updateUI() {
 	        btnUndo.disabled = !undoManager.hasUndo();
     	    btnRedo.disabled = !undoManager.hasRedo();
@@ -517,6 +502,8 @@ $(function() {
 	var btnUndo;
 	var btnRedo;
 	var dmxs;
+    var _row;
+    var _col;
 	var width;
 	var height;
 
@@ -593,7 +580,7 @@ $(function() {
 		var type = drag.attr('fixture-label');
 		drop.addClass(bgClass).attr('fixture-type', bgClass).attr('drop-target', 'true');
 
-		drop.attr("oncontextmenu", "detailForm(\""+drop.attr('id')+"\", \""+drop.attr('fixture-type')+"\");").addClass('pegg').attr('data-toggle', 'popover').attr('fixture-label',drag.attr('fixture-label')).html('<div class="desc"><p class="pdesc">'+drag.attr('fixture-label')+'-'+drop.attr('id')+'</p></div>');
+		drop.attr("oncontextmenu", "detailForm(\""+drop.attr('id')+"\", \""+drop.attr('fixture-type')+"\");").addClass('pegg').attr('data-toggle', 'popover').attr('fixture-label',drag.attr('fixture-label')).append('<div class="desc"><p class="pdesc">'+drag.attr('fixture-label')+'-'+drop.attr('id')+'</p></div>');
 
 		var dmxno = getdmx(id, drop, drag);
 		
@@ -700,7 +687,6 @@ $(function() {
 
 	function dragLeave(ev) {
 		ev.preventDefault();
-		//ev.defaultPrevented();
 		if (!ev.target.classList.contains("pdesc") && !ev.target.classList.contains("desc")) {
 			ev.target.style.border = '2px solid #e1e1e8';
 		}
@@ -715,7 +701,6 @@ $(function() {
 
 	function drop(ev) {
 		ev.preventDefault();
-		//ev.defaultPrevented();
 
 		if (ev.target.classList.contains("pdesc") || ev.target.classList.contains("desc")) {
 			$('.col-right').css('opacity', '1');
@@ -751,6 +736,12 @@ $(function() {
 		dmx[0]=dmx[0].slice(1,dmx[0].length);
 		dmx[1]=dmx[1].slice(1,dmx[1].length);
 		var dmxno = (dmx[0]-1)*_row+parseInt(dmx[1]);
+
+		//if element has been dragged from the grid, clear dragged color
+		if (drag.attr('drop-target')) {
+			//$('#' + drag.attr('id')).removeClass(bgClass).removeAttr('fixture-type').removeAttr('drop-target').html("");
+			removefixture(drag.attr('id'), drag);
+		}
 		
 		//clear the previously applied color, if it exists
 		if (bgClass) {
