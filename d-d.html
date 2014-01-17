@@ -338,46 +338,46 @@ var UndoManager = function () {
 	};
 };
 $(function() {
-	var data = [	// JSON format
-		{
-			label: 'Generic',
-			id: 'c1',
-			type: 'parent',
-			children: [
-				{ label: 'Fernel', id: 'c1-f1' },
-				{ label: 'Soft', id: 'c1-f2' },
-				{ label: 'Cool Light (Soft)', id: 'c1-f3' },
-				{ label: 'Cool Light (Spot)', id: 'c1-f4' },
-				{ label: 'LED', id: 'c1-f5' },
-				{ label: 'LED (RGB)', id: 'c1-f6' }
-			]
-		},
-		{
-			label: 'Hamaye',
-			id: 'c2',
-			type: 'parent',
-			children: [
-				{ label: 'AF650', id: 'c2-f1' },
-				{ label: 'AF1000', id: 'c2-f2' },
-				{ label: 'AF2000', id: 'c2-f3' },
-				{ label: 'BH110', id: 'c2-f4' },
-				{ label: 'BH220', id: 'c2-f5' },
-				{ label: 'BH330', id: 'c2-f6' },
-				{ label: 'BH440', id: 'c2-f7' },
-			]
-		},
-		{
-			label: 'Martin',
-			id: 'c3',
-			type: 'parent',
-			children: [
-				{ label: 'Moving Head M1', id: 'c3-f1' },
-				{ label: 'Moving Head M2', id: 'c3-f2' },
-				{ label: 'Scanner S1', id: 'c3-f3' },
-				{ label: 'Scanner S2', id: 'c3-f4' },
-			]
-		}
-	];
+	var data = [
+	    		{
+	    			label: 'Generic',
+	    			id: 'c1',
+	    			type: 'parent',
+	    			children: [
+	    				{ label: 'Fernel', id: 'c1-f1' },
+	    				{ label: 'Soft', id: 'c1-f2' },
+	    				{ label: 'Cool Light (Soft)', id: 'c1-f3' },
+	    				{ label: 'Cool Light (Spot)', id: 'c1-f4' },
+	    				{ label: 'LED', id: 'c1-f5' },
+	    				{ label: 'LED (RGB)', id: 'c1-f6' }
+	    			]
+	    		},
+	    		{
+	    			label: 'Hamaye',
+	    			id: 'c2',
+	    			type: 'parent',
+	    			children: [
+	    				{ label: 'AF650', id: 'c2-f1' },
+	    				{ label: 'AF1000', id: 'c2-f2' },
+	    				{ label: 'AF2000', id: 'c2-f3' },
+	    				{ label: 'BH110', id: 'c2-f4' },
+	    				{ label: 'BH220', id: 'c2-f5' },
+	    				{ label: 'BH330', id: 'c2-f6' },
+	    				{ label: 'BH440', id: 'c2-f7' },
+	    			]
+	    		},
+	    		{
+	    			label: 'Martin',
+	    			id: 'c3',
+	    			type: 'parent',
+	    			children: [
+	    				{ label: 'Moving Head M1', id: 'c3-f1' },
+	    				{ label: 'Moving Head M2', id: 'c3-f2' },
+	    				{ label: 'Scanner S1', id: 'c3-f3' },
+	    				{ label: 'Scanner S2', id: 'c3-f4' },
+	    			]
+	    		}
+	            ];
 
 	var $tree = $('.items');
     $tree.tree({
@@ -405,6 +405,11 @@ $(function() {
 			title:"Projector ID :",
 			html:'true',
 			content: '<p><b>Projector Description :</b><br/> This is a projector from with id=  and type=Type.</p><br/><p>DMX Numbers = </p><br/><div class="image green"></div>'
+		});
+		
+		$(".peg").on('click', function(e) {
+			$(".pegg").not(this).popover('hide');
+			$(".peg").not(this).popover('hide');
 		});
 
 		$(window).scroll(function() {
@@ -472,14 +477,6 @@ $(function() {
 			if (bgClass) {
 				$(this).removeClass(bgClass).removeAttr('fixture-type').html("");
 			}
-		});
-
-		$(document).on('click', '.popover', function() {
-			$(this).popover('hide');
-		});
-		
-		$(".pegg").on('click', function() {
-			$(".pegg").popover('hide');
 		});
 		
 	    btnUndo = document.getElementById('btnUndo');
@@ -825,6 +822,11 @@ $(function() {
 			$('#' + drag.attr('id')).removeClass(bgClass).removeAttr('fixture-type').removeAttr('drop-target').html("");
 			//removefixture(drag.attr('id'), drag);
 		}
+		
+		$(".pegg").on('click', function(e) {
+			$(".pegg").not(this).popover('hide');
+			$(".peg").not(this).popover('hide');
+		});
 		
 		resetUI();
 		//createfixture(drop.attr('id'), last, drop, drag);
