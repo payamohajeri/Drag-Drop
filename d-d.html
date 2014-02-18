@@ -221,7 +221,11 @@
 			for( var i=1; i<_row; i++ ) {
 				document.write('<div id=\"row-c'+i+'\">');
 				for (var j=1; j<_col; j++ ) {
-					document.write('<span class="slot" id="c'+i+'-f'+j+'" oncontextmenu="rightClick(this)" ondrop="drop(event)" ondragleave="dragLeave(event)" ondragover="dragOver(event)" draggable="true" ondragstart="drag(event)"></span>');
+					if (i==1 && j==1){
+						document.write('<span dmx="1" fixture-label="Fernel" data-toggle="popover" drop-target="true" fixture-type="green" style="width: 50px; height: 50px;" oncontextmenu="detailForm(&quot;c1-f1&quot;, &quot;green&quot;);" class="slot green pegg" id="c1-f1" ondrop="drop(event)" ondragleave="dragLeave(event)" ondragover="dragOver(event)" draggable="true" ondragstart="drag(event)"><div class="desc"><p class="pdesc">Fernel-c1-f1</p></div></span>');
+					} else {
+						document.write('<span class="slot" id="c'+i+'-f'+j+'" oncontextmenu="rightClick(this)" ondrop="drop(event)" ondragleave="dragLeave(event)" ondragover="dragOver(event)" draggable="true" ondragstart="drag(event)"></span>');
+					}
 				}
 				document.write('</div>');
 			}
@@ -472,16 +476,44 @@ $(function() {
 			$.q('.col-right').width(((width + 5) * 55) + 20).height(((height + 5) * 55) + 20);
 		});
 
-		$(document).on('dblclick', '.slot', function() {
+		$(document).on('dblclick', '.slot', function() {			
+			var dmxno2 = $(this).attr('dmx');
+			var bgClass2 = $(this).attr("fixture-type");
+			var label = $(this).attr('fixture-label');
+			var this2 = this;
+
+			undoManager.add({
+				undo: function() {
+					var dmxno = dmxno2 ;
+					var bgClass = bgClass2;
+					$(this2).addClass(bgClass).attr('fixture-type', bgClass).attr('drop-target', 'true');
+					$(this2).attr("oncontextmenu", "detailForm(\""+$(this2).attr('id')+"\", \""+$(this2).attr('fixture-type')+"\");").addClass('pegg').attr('data-toggle', 'popover').attr('fixture-label',$(this2).attr('fixture-label')).html('<div class="desc"><p class="pdesc">'+label+'-'+$(this2).attr('id')+'</p></div>');
+					$(this2).attr("dmx", dmxno);
+					$('.pegg').popover({
+						title:"Projector :" + $(this2).attr('fixture-label')+'-'+$(this2).attr('id'),
+						html:'true',
+						content: '<p><b>Projector Description :</b><br/> This is a projector from with id='+$(this2).attr('id')+'  and type='+$(this2).attr('fixture-label')+'.</p><br/><p>DMX Numbers = '+ dmxno +'</p><br/><div class="image green"></div>'
+					});
+					resetUI();
+				},
+				redo: function() {
+					var dmxno = dmxno2 ;
+					var bgClass = bgClass2;
+					$(this2).removeClass(bgClass).removeAttr('fixture-type').removeClass('pegg').removeAttr('drop-target').removeAttr("oncontextmenu").removeAttr('data-toggle').removeAttr('fixture-label').attr("oncontextmenu", "rightClick(this)").removeAttr("style").removeAttr("data-original-title").removeAttr("last").removeAttr("dmx").html("");
+	                resetUI();
+				}
+			});
+			
 			var bgClass = $(this).attr('fixture-type');
 			if (bgClass) {
 				$(this).removeClass(bgClass).removeAttr('fixture-type').html("");
 			}
+			
 		});
 		
 	    btnUndo = document.getElementById('btnUndo');
 	    btnRedo = document.getElementById('btnRedo');
-	    
+
 	    function updateUI() {
 	        btnUndo.disabled = !undoManager.hasUndo();
     	    btnRedo.disabled = !undoManager.hasRedo();
@@ -507,6 +539,23 @@ $(function() {
 		for( var i=1; i<=512; i++ ) {
 			dmxs.push(i);
 		}
+		
+		//%READY%
+		makeitpop("c1-f1");
+		
+ 		$(document).on('click', function (e) {
+		     $('.pegg').each(function () {
+		        //the 'is' for buttons that trigger popups
+		        //the 'has' for icons within a button that triggers a popup
+		        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+		            $(this).popover('hide');
+		        }
+		    });
+ 		    if($('.popover').lenght>0){
+		    	$('.pegg').popover('hide');
+		    	$('.peg').popover('hide');
+		    } 
+		});
 
 	});
 
@@ -517,6 +566,21 @@ $(function() {
 	var width;
 	var height;
 
+	function makeitpop(id){
+		var this2 = $('#'+id);
+		$('#'+id).addClass('pegg');
+		$('.pegg').popover({
+			title:"Projector :" + $(this2).attr('fixture-label')+'-'+$(this2).attr('id'),
+			html:'true',
+			content: '<p><b>Projector Description :</b><br/> This is a projector from with id='+$(this2).attr('id')+'  and type='+$(this2).attr('fixture-label')+'.</p><br/><p>DMX Numbers = '+ $(this2).attr('dmx') +'</p><br/><div class="image green"></div>'
+		});
+		
+		$(".pegg").on('click', function(e) {
+			$(".pegg").not(this).popover('hide');
+			$(".peg").not(this).popover('hide');
+		});
+	}
+	
     function resetUI() {
 		$.q('.slot').width(width).height(height);
 		$.q('.col-right').width(((width + 5) * 55) + 20).height(((height + 5) * 55) + 20);
@@ -737,7 +801,7 @@ $(function() {
 		//colored grid cannot remove colored grid
 		if (drop.attr('fixture-type')) {
 			return;
-		}
+		}	
 		
 		//add the dragged color
 		var bgClass = drag.attr("fixture-type");
@@ -827,7 +891,7 @@ $(function() {
 			$(".pegg").not(this).popover('hide');
 			$(".peg").not(this).popover('hide');
 		});
-		
+ 		
 		resetUI();
 		//createfixture(drop.attr('id'), last, drop, drag);
 	}
