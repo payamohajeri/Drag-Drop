@@ -596,7 +596,7 @@ $(function() {
 		var dmx = drop.attr('id').split('-');
 		dmx[0]=dmx[0].slice(1,dmx[0].length);
 		dmx[1]=dmx[1].slice(1,dmx[1].length);
-		var dmx2 = (dmx[0]-1)*_row+parseInt(dmx[1]);
+		var dmx2 = (dmx[0]-1)*_col+parseInt(dmx[1]);
 		//var index = dmxs.indexOf(dmx2);
 		var type, out;
 		type=drag.attr('fixture-label');
@@ -811,7 +811,7 @@ $(function() {
 		var dmx = drop.attr('id').split('-');
 		dmx[0]=dmx[0].slice(1,dmx[0].length);
 		dmx[1]=dmx[1].slice(1,dmx[1].length);
-		var dmxno = (dmx[0]-1)*_row+parseInt(dmx[1]);
+		var dmxno = (dmx[0]-1)*_col+parseInt(dmx[1]);
 		
 		//clear the previously applied color, if it exists
 		if (bgClass) {
@@ -841,7 +841,7 @@ $(function() {
 					var dmx = drag.attr('id').split('-');
 					dmx[0]=dmx[0].slice(1,dmx[0].length);
 					dmx[1]=dmx[1].slice(1,dmx[1].length);
-					var dmxno = (dmx[0]-1)*_row+parseInt(dmx[1]);
+					var dmxno = (dmx[0]-1)*_col+parseInt(dmx[1]);
 				}
 				var bgClass = drag.attr("fixture-type");
 				$('#' + drop.attr('id')).removeClass(bgClass).removeAttr('fixture-type').removeClass('pegg').removeAttr('drop-target').removeAttr("oncontextmenu").removeAttr('data-toggle').removeAttr('fixture-label').attr("oncontextmenu", "rightClick(this)").removeAttr("style").removeAttr("data-original-title").removeAttr("last").removeAttr("dmx").html("");
@@ -863,7 +863,7 @@ $(function() {
 				var dmx = drop.attr('id').split('-');
 				dmx[0]=dmx[0].slice(1,dmx[0].length);
 				dmx[1]=dmx[1].slice(1,dmx[1].length);
-				var dmxno = (dmx[0]-1)*_row+parseInt(dmx[1]);
+				var dmxno = (dmx[0]-1)*_col+parseInt(dmx[1]);
 				var bgClass = drag.attr("fixture-type");
 				
 				$('#' + drop.attr('id')).addClass(bgClass).attr('fixture-type', bgClass).attr('drop-target', 'true');
