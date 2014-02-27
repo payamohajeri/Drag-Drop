@@ -2,9 +2,9 @@
 <head>
 	<title>Drag and Drop Demo</title>
 	<script src="js/jquery.min.js"></script>
-	<script src="js/jqache-0.1.1.min.js"></script>
+	<!-- <script src="js/jqache-0.1.1.min.js"></script>  -->
 	<script src="js/bootstrap.min.js"></script>
-	<script src="js/bootstrap-popover.min.js"></script>
+	<!--  <script src="js/bootstrap-popover.min.js"></script>  -->
 	<!-- <script type="text/javascript" src="js/undomanager.js"></script> -->
 	<link href="css/bootstrap.css" rel="stylesheet">
 	<!-- NEW/ -->
@@ -87,8 +87,8 @@
 
 		.col-right {
 			margin-left: 290px;
-			width: 1000px;
-			height: 1000px;
+			width: 2850px;
+			height: 2850px;
 			display: inline-block;
 			position: absolute;
 			margin-top:80px;
@@ -216,8 +216,8 @@
 		</div>
 		<div class="col-right">
 		<script>
-			var _row = 10;
-			var _col = 10;
+			var _row = 50;
+			var _col = 50;
 			for( var i=1; i<_row; i++ ) {
 				document.write('<div id=\"row-c'+i+'\">');
 				for (var j=1; j<_col; j++ ) {
@@ -446,8 +446,8 @@ $(function() {
 			width = width - 25;
 			height = height - 25;
 
-			$.q('.slot').width(width).height(height);
-			$.q('.col-right').width(((width + 5) * 55) + 20).height(((height + 5) * 55) + 20);
+/* 			$.q('.slot').width(width).height(height);
+			$.q('.col-right').width(((width + 5) * 65) + 150).height(((height + 5) * 65) + 150); */
 		});
 
 		$('.zoomin').on('click', function() {
@@ -472,8 +472,8 @@ $(function() {
 			width = width + 25;
 			height = height + 25;
 
-			$.q('.slot').width(width).height(height);
-			$.q('.col-right').width(((width + 5) * 55) + 20).height(((height + 5) * 55) + 20);
+/* 			$.q('.slot').width(width).height(height);
+			$.q('.col-right').width(((width + 5) * 65) + 150).height(((height + 5) * 65) + 150); */
 		});
 
 		$(document).on('dblclick', '.slot', function() {			
@@ -494,13 +494,13 @@ $(function() {
 						html:'true',
 						content: '<p><b>Projector Description :</b><br/> This is a projector from with id='+$(this2).attr('id')+'  and type='+$(this2).attr('fixture-label')+'.</p><br/><p>DMX Numbers = '+ dmxno +'</p><br/><div class="image green"></div>'
 					});
-					resetUI();
+					//resetUI();
 				},
 				redo: function() {
 					var dmxno = dmxno2 ;
 					var bgClass = bgClass2;
 					$(this2).removeClass(bgClass).removeAttr('fixture-type').removeClass('pegg').removeAttr('drop-target').removeAttr("oncontextmenu").removeAttr('data-toggle').removeAttr('fixture-label').attr("oncontextmenu", "rightClick(this)").removeAttr("style").removeAttr("data-original-title").removeAttr("last").removeAttr("dmx").html("");
-	                resetUI();
+	                //resetUI();
 				}
 			});
 			
@@ -550,12 +550,19 @@ $(function() {
 		        if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
 		            $(this).popover('hide');
 		        }
+		        
+		        if (!$(this).attr('fixture-type')) {
+		            $(this).popover('hide');
+		        }
 		    });
  		    if($('.popover').lenght>0){
 		    	$('.pegg').popover('hide');
 		    	$('.peg').popover('hide');
-		    } 
-		});
+		    }
+	        if ($(e.target).hasClass("slot") && !$(e.target).hasClass("pegg") ) {
+	        	$(e.target).popover('hide');
+	        }
+ 		});
 
 	});
 
@@ -582,8 +589,8 @@ $(function() {
 	}
 	
     function resetUI() {
-		$.q('.slot').width(width).height(height);
-		$.q('.col-right').width(((width + 5) * 55) + 20).height(((height + 5) * 55) + 20);
+/* 		$.q('.slot').width(width).height(height);
+		$.q('.col-right').width(((width + 5) * 65) + 200).height(((height + 5) * 65) + 200); */
     }	
 	
 	function sortNumber(a,b) {
@@ -836,7 +843,6 @@ $(function() {
 		
 		undoManager.add({
 			undo: function() {
-				
 				if (drag.attr('id')){
 					var dmx = drag.attr('id').split('-');
 					dmx[0]=dmx[0].slice(1,dmx[0].length);
@@ -856,10 +862,9 @@ $(function() {
     					content: '<p><b>Projector Description :</b><br/> This is a projector from with id='+drop.attr('id')+'  and type='+drag.attr('fixture-label')+'.</p><br/><p>DMX Numbers = '+ dmxno +'</p><br/><div class="image green"></div>'
     				});
                 }
-                resetUI();
+                //resetUI();
 			},
 			redo: function() {
-				
 				var dmx = drop.attr('id').split('-');
 				dmx[0]=dmx[0].slice(1,dmx[0].length);
 				dmx[1]=dmx[1].slice(1,dmx[1].length);
@@ -877,7 +882,7 @@ $(function() {
 				if (drag.attr('drop-target')) {
 					$('#' + drag.attr('id')).removeClass(bgClass).removeAttr('fixture-type').removeClass('pegg').removeAttr('drop-target').removeAttr("oncontextmenu").removeAttr('data-toggle').removeAttr('fixture-label').attr("oncontextmenu", "rightClick(this)").removeAttr("style").removeAttr("data-original-title").removeAttr("last").removeAttr("dmx").html("");
                 }
-				resetUI();
+				//resetUI();
 			}
 		});
 		
@@ -887,12 +892,12 @@ $(function() {
 			//removefixture(drag.attr('id'), drag);
 		}
 		
-		$(".pegg").on('click', function(e) {
+/* 		$(".pegg").on('click', function(e) {
 			$(".pegg").not(this).popover('hide');
 			$(".peg").not(this).popover('hide');
-		});
+		}); */
  		
-		resetUI();
+		//resetUI();
 		//createfixture(drop.attr('id'), last, drop, drag);
 	}
 </script>
